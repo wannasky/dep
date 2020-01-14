@@ -1,0 +1,18 @@
+
+Readme:
+
+  dep config
+  用指定用户名和密码进行相应的svn操作
+
+  example
+    1. 添加svn用户名和密码
+      dep config -u username -p password
+
+    2. 从env读取并添加svn用户名和密码
+      dep config -e -u SVN_USER_NAME -p SVN_PASSWORD
+
+    3. 查看配置
+      dep config -l
+
+
+

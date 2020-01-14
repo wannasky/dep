@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const logger = require('../lib/util/logger');
+const colors = require('colors');
+const utils = require('../lib/util/utils');
+const fileUtil = require('../lib/util/fileUtil');
+const execute = require('../lib/util/execute');
+
+utils.check();
+
+let depends = require(path.join(process.cwd(), '.svn.json'));
+if(depends.dependencies && depends.dependencies.length){
+    for(let i=0,l=depends.dependencies.length;i<l;i++){
+        let option = depends.dependencies[i];
+        let config = {};
+        config.moduleName = option.module;
+        config.repo = option.repo;
+        config.reversion = option.reversion || null;
+        let args = [
+            '  ',
+            config.moduleName.cyan,
+            ' ',
+            config.repo
+        ];
+        if(config.reversion){
+            args.push(` -r ${config.reversion}`);
+        }
+        console.log.apply(console, args);
+    }
+}else{
+    logger.warn('项目暂未依赖其他模块');
+}

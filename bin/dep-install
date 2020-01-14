@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+
+const commander = require('commander');
+const path = require('path');
+const logger = require('../lib/util/logger');
+const utils = require('../lib/util/utils');
+const fileUtil = require('../lib/util/fileUtil');
+
+
+process.on('unhandledRejection', error => {
+    throw error;
+});
+
+['SIGINT', 'SIGTERM'].forEach(sig => {
+    process.on(sig, () => {
+        process.exit();
+    });
+});
+
+commander
+    .option('-y, --yes', '提示信息默认按照yes执行')
+    .on('--help', () => {
+        logger.file(path.join(__dirname, '../doc/install.txt'))
+    })
+    .parse(process.argv);
+
+utils.check();
+
+let depends = require(path.join(process.cwd(), '.svn.json'));
+if(!depends.dependencies || !depends.dependencies.length){
+    logger.error('未发现可按照的模块');
+    process.exist(0);
+}
+
+let deps = JSON.parse(JSON.stringify(depends.dependencies));
+
+function loop(detail) {
+    if(!detail) return;
+    let option = detail;
+    let config = {};
+    config.moduleName = option.module;
+    config.position = option.position || option.module;
+    config.repo = option.repo;
+    config.reversion = option.reversion || null;
+    const moduleDir = path.join(process.cwd(), config.position);
+    if(fileUtil.exist(moduleDir)) {
+        let isSvnModule = utils.isSvnModule(moduleDir);
+        if(commander.yes){
+            if(isSvnModule){
+                utils.deleteSvnFiles(moduleDir);
+            }
+            utils.checkout(config.repo, config.position, config.reversion).then(() => {
+                loop(deps.shift());
+            });
+        }else{
+            let question;
+            if(isSvnModule){
+                question = `${config.position || config.module}目录已存在且是svn模块，是否重置后继续(y or n)?`;
+            }else{
+                question = `${config.position || config.module}目录已存在，是否继续(y or n)?`;
+            }
+
+            utils.askQuestion([question], (answers) => {
+                let answer = answers[0].toLowerCase();
+                if(answer === 'y' || answer === 'yes') {
+                    if(isSvnModule){
+                        utils.deleteSvnFiles(moduleDir);
+                    }
+                    utils.checkout(config.repo, config.position, config.reversion).then(() => {
+                        loop(deps.shift());
+                    });
+                }else{
+                    loop(deps.shift());
+                }
+            });
+        }
+    }else{
+        utils.checkout(config.repo, config.position, config.reversion).then(() => {
+            loop(deps.shift());
+        });
+    }
+}
+
+if(deps.length){
+    loop(deps.shift());
+}
+

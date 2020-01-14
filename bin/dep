@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+require('commander')
+    .version(require('../package').version)
+    .usage('<command> [options]')
+    .command('init', '初始化svn依赖关系')
+    .command('install', '安装svn项目依赖')
+    .command('add <repo>', '添加项目依赖的一个模块')
+    .command('remove <module>', '删除项目依赖的一个模块')
+    .command('update [module]', '更新依赖模块')
+    .command('list', '显示项目依赖的模块')
+    .command('config', '用户配置')
+    .parse(process.argv);

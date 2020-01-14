@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const commander = require('commander');
+const path = require('path');
+const logger = require('../lib/util/logger');
+const utils = require('../lib/util/utils');
+
+process.on('unhandledRejection', error => {
+    throw error;
+});
+
+['SIGINT', 'SIGTERM'].forEach(sig => {
+    process.on(sig, () => {
+        process.exit();
+    });
+});
+
+commander
+    .arguments('<moduleName>')
+    .on('--help', () => {
+        logger.file(path.join(__dirname, '../doc/remove.txt'))
+    })
+    .parse(process.argv);
+
+utils.check();
+
+let depends = require(path.join(process.cwd(), '.svn.json'));
+if(commander.args.length){
+    if(depends.dependencies && depends.dependencies.length){
+        let index = depends.dependencies.findIndex(item => item.module === commander.args[0]);
+        if(index === -1){
+            logger.error(`${commander.args[0]}模块不存在`);
+        }else{
+            let option = depends.dependencies[index];
+            let position = option.position || option.module;
+            utils.deleteSvnFiles(path.join(process.cwd(), position));
+            depends.dependencies.splice(index, 1);
+            utils.saveSvn(depends);
+        }
+    }else{
+        logger.error(`${commander.args[0]}模块不存在`);
+    }
+}else{
+    logger.error('请指定需要删除的svn模块，运行‘dep add --help’查看具体用法');
+}

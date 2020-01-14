@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+
+require('colors');
+const path = require('path');
+const fileUtil = require('../lib/util/fileUtil');
+const utils = require('../lib/util/utils');
+const logger = require('../lib/util/logger');
+
+const configFileName = '.svn.json';
+
+if(fileUtil.exist(path.join(process.cwd(), configFileName))){
+    console.log('svn配置文件已存在'.yellow);
+}else{
+    logger.info(fileUtil.readFileSync(path.join(__dirname, '../doc/init.txt')));
+    let questions = [
+        '项目名称：',
+        '项目描述：',
+        '关键字：',
+        '作者：'
+    ];
+    let json = {};
+    utils.askQuestion(questions, (answers)=> {
+        json.name = answers[0];
+        json.description = answers[1];
+        json.keywords = answers[2].split(',');
+        json.author = answers[3];
+        let question = '.svn.json内容如下：\r\n';
+        question += JSON.stringify(json, null, '\t') + '\r\n';
+        question += '是否正确?（yes）'
+        utils.askQuestion([question], (answers) => {
+            let answer = answers[0].toLowerCase();
+            if(answer === 'yes' || answer === 'y') {
+                fileUtil.writeFileSync(path.join(process.cwd(), configFileName), JSON.stringify(json, null, '\t'));
+            }
+        }, false);
+    }, false);
+}

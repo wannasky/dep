@@ -1,0 +1,6 @@
+
+Readme:
+
+  dep install
+  安装’.svn.json’中定义的项目依赖
+

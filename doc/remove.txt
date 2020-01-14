@@ -1,0 +1,12 @@
+
+Readme:
+
+  dep remove
+  删除svn项目依赖并同步配置
+
+  example
+
+  删除hato模块
+    dep remove hato
+
+

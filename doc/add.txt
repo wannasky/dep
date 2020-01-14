@@ -1,0 +1,15 @@
+
+Readme:
+
+  dep add
+  添加svn项目依赖
+
+  example
+  1. 添加hato模块到hato目录
+    dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/
+
+  2. 添加hato模块到rename目录
+    dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/ ./rename
+
+  3. 添加指定版本的
+    dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/ -r 86354
