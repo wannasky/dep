@@ -18,6 +18,7 @@ process.on('unhandledRejection', error => {
 });
 
 commander
+    .option('-t, --type <value>', '版本管理类型，svn or git')
     .option('-u, --username <value>', '指定用户名')
     .option('-p, --password <value>', '指定密码')
     .option('-e, --env', '从ENV获取用户名和密码')
@@ -30,15 +31,30 @@ commander
 let config = utils.getSvnConfig();
 
 if(commander.list){
-    logger.info(` username: ${config.username || ''} \r\n password: ${config.password || ''}`);
+    if(config.svn){
+        logger.info(`svn:`);
+        logger.info(`   username: ${config.svn.username || ''} \r\n   password: ${config.svn.password || ''}`);
+    }
+    if(config.git){
+        logger.info(`git:`);
+        logger.info(`   username: ${config.git.username || ''} \r\n   password: ${config.git.password || ''}`);
+    }
     return;
 }
 
-if(commander.username) {
-    config.username = commander.env ? process.env[commander.username] : commander.username;
+if(commander.type){
+    const type =commander.type.toLowerCase();
+    if(!config[type]) {
+        config[type] = {};
+    }
+    if(commander.username) {
+        config[type].username = commander.env ? process.env[commander.username] : commander.username;
+    }
+    if(commander.password){
+        config[type].password = commander.env ? process.env[commander.password] : commander.password;
+    }
 }
-if(commander.password){
-    config.password = commander.env ? process.env[commander.password] : commander.password;
-}
+
+
 
 fileUtil.writeFileSync(path.join(__dirname, '../lib/config/.config.json'), JSON.stringify(config, null, '\t'));

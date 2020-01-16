@@ -26,9 +26,9 @@ commander
 
 utils.check();
 
-let depends = require(path.join(process.cwd(), '.svn.json'));
+let depends = require(path.join(process.cwd(), '.dep.json'));
 if(!depends.dependencies || !depends.dependencies.length){
-    logger.error('未发现可按照的模块');
+    logger.error('未发现可安装的模块');
     process.exist(0);
 }
 
@@ -45,26 +45,28 @@ function loop(detail) {
     const moduleDir = path.join(process.cwd(), config.position);
     if(fileUtil.exist(moduleDir)) {
         let isSvnModule = utils.isSvnModule(moduleDir);
+        let isGitModule = utils.isGitModule(moduleDir);
         if(commander.yes){
             if(isSvnModule){
                 utils.deleteSvnFiles(moduleDir);
+            }
+            if(isGitModule){
+                utils.deleteGitFiles(moduleDir);
             }
             utils.checkout(config.repo, config.position, config.reversion).then(() => {
                 loop(deps.shift());
             });
         }else{
-            let question;
-            if(isSvnModule){
-                question = `${config.position || config.module}目录已存在且是svn模块，是否重置后继续(y or n)?`;
-            }else{
-                question = `${config.position || config.module}目录已存在，是否继续(y or n)?`;
-            }
+            let question = `${config.position || config.module}目录已存在，是否继续(y or n)?`;
 
             utils.askQuestion([question], (answers) => {
                 let answer = answers[0].toLowerCase();
                 if(answer === 'y' || answer === 'yes') {
                     if(isSvnModule){
                         utils.deleteSvnFiles(moduleDir);
+                    }
+                    if(isGitModule){
+                        utils.deleteGitFiles(moduleDir);
                     }
                     utils.checkout(config.repo, config.position, config.reversion).then(() => {
                         loop(deps.shift());

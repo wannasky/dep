@@ -39,18 +39,18 @@ if(commander.args[1]){
 const moduleDir = path.join(process.cwd(), config.position || config.module);
 
 if(fileUtil.exist(moduleDir)){
-    let question;
     let isSvnModule = utils.isSvnModule(moduleDir);
-    if(isSvnModule){
-        question = `${config.position || config.module}目录已存在且是svn模块，是否重置后继续(y or n)?`;
-    }else{
-        question = `${config.position || config.module}目录已存在，是否继续(y or n)?`;
-    }
+    let isGitModule = utils.isGitModule(moduleDir);
+    let question = `${config.position || config.module}目录已存在，是否继续(y or n)?`;
     utils.askQuestion([question], (answers) => {
         let answer = answers[0].toLowerCase();
         if(answer === 'y' || answer === 'yes') {
+            logger.info(`开始清除已跟踪文件: ${moduleDir}`);
             if(isSvnModule){
                 utils.deleteSvnFiles(moduleDir);
+            }
+            if(isGitModule){
+                utils.deleteGitFiles(moduleDir);
             }
             utils.checkoutAndSave(config.module, config.repo, config.position, commander.reversion);
         }

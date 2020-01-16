@@ -2,14 +2,20 @@
 Readme:
 
   dep add
-  添加svn项目依赖
+  添加项目依赖
 
   example
   1. 添加hato模块到hato目录
     dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/
 
+    dep add hato:https://github.com/svn/cloud/Hato/trunk/html/tembin.git
+
   2. 添加hato模块到rename目录
     dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/ ./rename
 
+    dep add hato:https://github.com/svn/cloud/Hato/trunk/html/tembin.git ./rename
+
   3. 添加指定版本的
     dep add hato:https://svn.nsfocus.com/svn/cloud/Hato/trunk/html/tembin/ -r 86354
+
+    dep add hato:https://github.com/svn/cloud/Hato/trunk/html/tembin.git -r 86354

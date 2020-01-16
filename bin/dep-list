@@ -9,7 +9,7 @@ const execute = require('../lib/util/execute');
 
 utils.check();
 
-let depends = require(path.join(process.cwd(), '.svn.json'));
+let depends = require(path.join(process.cwd(), '.dep.json'));
 if(depends.dependencies && depends.dependencies.length){
     for(let i=0,l=depends.dependencies.length;i<l;i++){
         let option = depends.dependencies[i];

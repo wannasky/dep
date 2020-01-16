@@ -24,7 +24,7 @@ commander
 
 utils.check();
 
-let depends = require(path.join(process.cwd(), '.svn.json'));
+let depends = require(path.join(process.cwd(), '.dep.json'));
 if(commander.args.length){
     if(depends.dependencies && depends.dependencies.length){
         let index = depends.dependencies.findIndex(item => item.module === commander.args[0]);
@@ -33,7 +33,11 @@ if(commander.args.length){
         }else{
             let option = depends.dependencies[index];
             let position = option.position || option.module;
-            utils.deleteSvnFiles(path.join(process.cwd(), position));
+            if(utils.isGitRepo(option.repo)){
+                utils.deleteGitFiles(path.join(process.cwd(), position));
+            }else{
+                utils.deleteSvnFiles(path.join(process.cwd(), position));
+            }
             depends.dependencies.splice(index, 1);
             utils.saveSvn(depends);
         }
@@ -41,5 +45,5 @@ if(commander.args.length){
         logger.error(`${commander.args[0]}模块不存在`);
     }
 }else{
-    logger.error('请指定需要删除的svn模块，运行‘dep add --help’查看具体用法');
+    logger.error('请指定需要删除的依赖模块，运行‘dep remove --help’查看具体用法');
 }

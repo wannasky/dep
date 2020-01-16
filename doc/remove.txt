@@ -2,7 +2,7 @@
 Readme:
 
   dep remove
-  删除svn项目依赖并同步配置
+  删除项目依赖并同步配置
 
   example
 

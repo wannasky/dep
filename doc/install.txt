@@ -2,5 +2,5 @@
 Readme:
 
   dep install
-  安装’.svn.json’中定义的项目依赖
+  安装’.dep.json’中定义的项目依赖
 
